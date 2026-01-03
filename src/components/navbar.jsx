@@ -1,9 +1,22 @@
 import React, { useState, useMemo } from 'react';
+import { supabase } from '../supabaseClient'; // Import Supabase
 import { TransactionStatus } from '../types';
 
 export const Navbar = ({ isDarkMode, toggleDarkMode, transactions = [], onNavigate, userProfile }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isInfoOpen, setIsInfoOpen] = useState(false);
+
+  // New: Handle Logout Function
+  const handleLogout = async () => {
+      try {
+          const { error } = await supabase.auth.signOut();
+          if (error) throw error;
+          // The App.jsx listener will automatically detect the session change
+          // and redirect the user to the Login screen.
+      } catch (error) {
+          console.error('Error logging out:', error.message);
+      }
+  };
 
   const notifications = useMemo(() => {
     const list = [];
@@ -159,7 +172,6 @@ export const Navbar = ({ isDarkMode, toggleDarkMode, transactions = [], onNaviga
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             className="flex items-center gap-3 pl-2 pr-1 py-1 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full cursor-pointer transition-colors border border-transparent hover:border-slate-200 dark:hover:border-slate-700 select-none"
           >
-            {/* UPDATED: Use dynamic userProfile data */}
             <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 hidden sm:inline">
               {userProfile?.name || 'Admin User'}
             </span>
@@ -187,8 +199,12 @@ export const Navbar = ({ isDarkMode, toggleDarkMode, transactions = [], onNaviga
                   Profile
                 </button>
                 
+                {/* Updated Logout Button */}
                 <button 
-                  onClick={() => setIsDropdownOpen(false)}
+                  onClick={() => {
+                      setIsDropdownOpen(false);
+                      handleLogout(); // Call the logout function here
+                  }}
                   className="w-full text-left px-4 py-2.5 text-xs font-bold text-[#ce2727] hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors flex items-center gap-2.5"
                 >
                   <span className="material-symbols-outlined text-[18px]">logout</span>

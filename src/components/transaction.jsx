@@ -1,6 +1,21 @@
 import React, { useState } from 'react';
 import { TransactionStatus } from '../types';
 
+// --- NEW HELPER FUNCTION: Forces Philippine Time Format ---
+const formatToPHTime = (dateString) => {
+  if (!dateString) return '-- / --';
+  const date = new Date(dateString);
+  return new Intl.DateTimeFormat('en-PH', {
+    year: 'numeric', 
+    month: 'short', 
+    day: '2-digit',
+    hour: 'numeric', 
+    minute: '2-digit', 
+    hour12: true,
+    timeZone: 'Asia/Manila' // Forces PH Timezone
+  }).format(date);
+};
+
 export const TransactionSection = ({
   transactions,
   selectedTransaction,
@@ -73,18 +88,16 @@ export const TransactionSection = ({
           </div>
         </div>
 
-        {/* Table Header - Increased gap to 6, Center aligned headers */}
+        {/* Table Header */}
         <div className="grid grid-cols-[48px_1fr_120px_160px_100px] gap-6 px-4 py-2.5 text-[10px] font-black text-slate-300 dark:text-slate-600 uppercase tracking-widest border-b dark:border-slate-800">
           <span></span>
           <span className="text-left">Name</span>
-          {/* CHANGED: Center aligned */}
           <span className="text-center">Amount</span>
-          {/* CHANGED: Center aligned */}
-          <span className="text-center">Date & Time</span>
+          <span className="text-center">Encoded On</span> {/* Changed label to fit context */}
           <span className="text-center">Status</span>
         </div>
 
-        {/* Table Body - Increased gap to 6, Center aligned values */}
+        {/* Table Body */}
         <div className="flex-1 overflow-y-auto pr-1 mt-1 custom-scroll">
           {transactions.map(t => (
             <div 
@@ -94,10 +107,13 @@ export const TransactionSection = ({
             >
               <img src={t.avatar} className="w-9 h-9 rounded-full border-2 border-white dark:border-slate-700 shadow-sm" alt="" />
               <span className="text-xs font-bold text-slate-700 dark:text-slate-200 truncate">{t.name}</span>
-              {/* CHANGED: Center aligned */}
               <span className="text-xs font-black text-slate-900 dark:text-white text-center">₱{t.amount.toLocaleString()}</span>
-              {/* CHANGED: Center aligned */}
-              <span className="text-[11px] text-slate-400 dark:text-slate-600 font-medium truncate text-center">{t.dateBorrowed}</span>
+              
+              {/* --- UPDATED: Uses 'created_at' for system time --- */}
+              <span className="text-[11px] text-slate-400 dark:text-slate-600 font-medium truncate text-center">
+                {formatToPHTime(t.created_at || t.createdAt)}
+              </span>
+
               <div className="flex justify-center">
                 <StatusBadge status={t.status} />
               </div>
@@ -177,7 +193,10 @@ export const TransactionSection = ({
                   </div>
                   <div>
                     <p className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wide">Date Borrowed</p>
-                    <p className="text-slate-700 dark:text-slate-200 font-semibold text-xs">{selectedTransaction.dateBorrowed}</p>
+                    {/* --- UPDATED: Formats the Date Borrowed user input --- */}
+                    <p className="text-slate-700 dark:text-slate-200 font-semibold text-xs">
+                        {formatToPHTime(selectedTransaction.dateBorrowed)}
+                    </p>
                   </div>
                 </div>
 
@@ -192,7 +211,7 @@ export const TransactionSection = ({
                 </div>
 
                 <div className={`flex gap-3 ${!selectedTransaction.datePaid && 'opacity-50 grayscale'}`}>
-                   <div className="w-8 h-8 rounded-full bg-purple-50 dark:bg-purple-900/20 flex items-center justify-center shrink-0 text-purple-500 dark:text-purple-400">
+                    <div className="w-8 h-8 rounded-full bg-purple-50 dark:bg-purple-900/20 flex items-center justify-center shrink-0 text-purple-500 dark:text-purple-400">
                     <span className="material-symbols-outlined text-[16px]">check_circle</span>
                   </div>
                   <div>
