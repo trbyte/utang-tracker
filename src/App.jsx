@@ -3,24 +3,32 @@ import { Navbar } from './components/navbar';
 import { Overview } from './components/overview';
 import { TransactionSection } from './components/transaction';
 import { AddRecordModal } from './components/addrecord';
-import { ProfilePage } from './components/profile'; // Import the new component
+import { ProfilePage } from './components/profile';
 import { TransactionStatus } from './types';
 
 const App = () => {
+  // ... (keep existing state: transactions, selectedId, etc.)
   const [transactions, setTransactions] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('ALL');
   const [editingTransaction, setEditingTransaction] = useState(null);
-  
-  // NEW: State to control View (Dashboard vs Profile)
   const [currentView, setCurrentView] = useState('DASHBOARD');
+
+  // NEW: Lifted Profile State
+  const [userProfile, setUserProfile] = useState({
+    name: 'Admin User',
+    email: 'admin@utangtracker.pro',
+    phone: '+63 917 123 4567',
+    avatar: 'https://picsum.photos/seed/admin/200' // Default initial avatar
+  });
 
   const [isDarkMode, setIsDarkMode] = useState(() => {
     return localStorage.getItem('theme') === 'dark';
   });
 
+  // ... (keep useEffect for Dark Mode)
   useEffect(() => {
     if (isDarkMode) {
       document.documentElement.classList.add('dark');
@@ -33,7 +41,7 @@ const App = () => {
 
   const toggleDarkMode = () => setIsDarkMode(!isDarkMode);
 
-  // ... (keep stats, filteredTransactions, and selectedTransaction logic as is)
+  // ... (keep stats, filteredTransactions, selectedTransaction logic)
   const stats = useMemo(() => {
     const totalOwed = transactions
       .filter(t => t.status !== TransactionStatus.COMPLETED)
@@ -66,6 +74,7 @@ const App = () => {
     transactions.find(t => t.id === selectedId) || null,
   [transactions, selectedId]);
 
+  // ... (keep handleSaveRecord, handleEditClick, handleSettle, handleCloseModal)
   const handleSaveRecord = (record) => {
     const sanitizedRecord = { ...record, amount: parseFloat(record.amount) || 0 };
     if (editingTransaction) {
@@ -111,8 +120,8 @@ const App = () => {
         isDarkMode={isDarkMode} 
         toggleDarkMode={toggleDarkMode} 
         transactions={transactions}
-        // Pass navigation handler
         onNavigate={setCurrentView}
+        userProfile={userProfile} // CHANGED: Pass profile to Navbar
       />
       
       <main className="flex-1 p-6 flex flex-col gap-6 overflow-hidden">
@@ -142,7 +151,11 @@ const App = () => {
             </section>
           </>
         ) : (
-          <ProfilePage onBack={() => setCurrentView('DASHBOARD')} />
+          <ProfilePage 
+            onBack={() => setCurrentView('DASHBOARD')} 
+            userProfile={userProfile} // CHANGED: Pass current profile
+            onUpdateProfile={setUserProfile} // CHANGED: Pass updater function
+          />
         )}
       </main>
 

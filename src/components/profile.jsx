@@ -1,12 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 
-export const ProfilePage = ({ onBack }) => {
-  const [profile, setProfile] = useState({
+// CHANGED: Accept userProfile and onUpdateProfile props
+export const ProfilePage = ({ onBack, userProfile, onUpdateProfile }) => {
+  const [profile, setProfile] = useState(userProfile || {
     name: 'Admin User',
     email: 'admin@utangtracker.pro',
     phone: '+63 917 123 4567',
     avatar: 'https://picsum.photos/seed/admin/200'
   });
+
+  const fileInputRef = useRef(null);
 
   const [passwordForm, setPasswordForm] = useState({
     current: '',
@@ -14,8 +17,29 @@ export const ProfilePage = ({ onBack }) => {
     confirm: ''
   });
 
+  // Sync state if prop changes
+  useEffect(() => {
+    if (userProfile) setProfile(userProfile);
+  }, [userProfile]);
+
+  // NEW: Image Upload Handler
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfile(prev => ({ ...prev, avatar: reader.result }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleUpdateProfile = (e) => {
     e.preventDefault();
+    // CHANGED: Call prop to update global state
+    if (onUpdateProfile) {
+      onUpdateProfile(profile);
+    }
     alert('Profile updated successfully!');
   };
 
@@ -74,7 +98,10 @@ export const ProfilePage = ({ onBack }) => {
             <form onSubmit={handleUpdateProfile} className="flex flex-col gap-5">
               {/* Avatar Row */}
               <div className="flex items-center gap-5">
-                <div className="relative group shrink-0">
+                <div 
+                  className="relative group shrink-0 cursor-pointer"
+                  onClick={() => fileInputRef.current?.click()} 
+                >
                   <img 
                     src={profile.avatar} 
                     alt="Profile" 
@@ -83,6 +110,14 @@ export const ProfilePage = ({ onBack }) => {
                   <button type="button" className="absolute -bottom-1 -right-1 w-8 h-8 bg-[#ce2727] text-white rounded-full flex items-center justify-center shadow-md border-2 border-white dark:border-slate-900 group-hover:scale-110 transition-transform">
                     <span className="material-symbols-outlined text-[16px]">edit</span>
                   </button>
+                  {/* HIDDEN INPUT */}
+                  <input 
+                    type="file" 
+                    ref={fileInputRef} 
+                    onChange={handleImageUpload} 
+                    accept="image/*" 
+                    className="hidden" 
+                  />
                 </div>
                 <div className="flex-1">
                   <ProfileInput 
@@ -208,10 +243,6 @@ export const ProfilePage = ({ onBack }) => {
   );
 };
 
-// INCREASED SIZES HERE:
-// Label: text-[11px] (was 9px)
-// Input: text-sm (was xs) + py-3 (was py-2.5)
-// Icon: text-[20px] (was 16px)
 const ProfileInput = ({ label, value, onChange, icon, type = "text", placeholder }) => (
   <div className="flex flex-col gap-1.5">
     <label className="text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider ml-1">{label}</label>

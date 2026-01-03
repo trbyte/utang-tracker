@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { TransactionStatus } from '../types';
 
-export const Navbar = ({ isDarkMode, toggleDarkMode, transactions = [], onNavigate }) => {
+export const Navbar = ({ isDarkMode, toggleDarkMode, transactions = [], onNavigate, userProfile }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isInfoOpen, setIsInfoOpen] = useState(false);
 
@@ -80,7 +80,7 @@ export const Navbar = ({ isDarkMode, toggleDarkMode, transactions = [], onNaviga
                   <strong>UtangTracker</strong> is a simple and efficient tool designed to help you manage personal debts and loans. Keep track of who owes you and who you owe with ease.
                 </p>
 
-                {/* ADDED: Under Development Note */}
+                {/* Under Development Note */}
                 <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-900/30 rounded-xl p-3 mb-4">
                   <div className="flex gap-2 items-start">
                     <span className="material-symbols-outlined text-amber-500 text-sm mt-0.5">construction</span>
@@ -159,9 +159,12 @@ export const Navbar = ({ isDarkMode, toggleDarkMode, transactions = [], onNaviga
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             className="flex items-center gap-3 pl-2 pr-1 py-1 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full cursor-pointer transition-colors border border-transparent hover:border-slate-200 dark:hover:border-slate-700 select-none"
           >
-            <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 hidden sm:inline">Admin User</span>
+            {/* UPDATED: Use dynamic userProfile data */}
+            <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 hidden sm:inline">
+              {userProfile?.name || 'Admin User'}
+            </span>
             <img 
-              src="https://picsum.photos/seed/admin/100" 
+              src={userProfile?.avatar || 'https://picsum.photos/seed/admin/100'} 
               alt="User Avatar" 
               className="w-8 h-8 rounded-full object-cover border-2 border-white dark:border-slate-700 shadow-sm"
             />
