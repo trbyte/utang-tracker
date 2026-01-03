@@ -152,9 +152,9 @@ export const Navbar = ({ isDarkMode, toggleDarkMode, transactions = [], onNaviga
           </div>
         </div>
 
-        <button className="p-1.5 lg:p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors text-slate-500 dark:text-slate-400 relative">
+        {/* <button className="p-1.5 lg:p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors text-slate-500 dark:text-slate-400 relative">
           <span className="material-symbols-outlined text-[18px] lg:text-[24px]">mail</span>
-        </button>
+        </button> */}
         
         <div className="h-6 lg:h-8 w-[1px] bg-slate-200 dark:bg-slate-800 mx-1 lg:mx-2"></div>
 
