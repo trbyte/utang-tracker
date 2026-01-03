@@ -39,7 +39,7 @@ export default function VerifyEmail({ onNavigate, isDarkMode, toggleDarkMode, em
     return (
         <GuestLayout isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode}>
             <div className="space-y-4">
-                {/* Header Section (Matches Forgot Password Style) */}
+                {/* Header Section */}
                 <div className="space-y-1">
                     <p className="inline-flex items-center gap-2 rounded-full bg-[#ce2727]/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#ce2727] ring-1 ring-[#ce2727]/30">
                         Verification
@@ -49,40 +49,38 @@ export default function VerifyEmail({ onNavigate, isDarkMode, toggleDarkMode, em
                             Verify email address
                         </h1>
                         <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                            Thanks for signing up! Before getting started, please verify your email by clicking the link we just sent.
+                            Thanks for signing up! We sent a verification link to{' '}
+                            <span className="font-bold text-slate-700 dark:text-slate-200">{email}</span>. 
+                            Please click the link to get started.
                         </p>
                     </div>
                 </div>
 
                 {/* Status Message */}
                 {status && (
-                    <div className="p-3 bg-green-500/10 border border-green-500/20 rounded-xl text-green-600 text-sm font-bold">
+                    <div className="p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-900/30 rounded-lg text-green-700 dark:text-green-400 text-xs font-bold animate-in fade-in slide-in-from-top-1">
                         {status}
                     </div>
                 )}
 
                 {/* Action Buttons */}
-                <form className="space-y-4">
-                    {/* Spacer to match form inputs height if needed, or just standard spacing */}
-                    
-                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pt-2">
-                        <button
-                            type="button"
-                            onClick={handleLogout}
-                            className="text-xs font-bold text-slate-500 hover:text-[#ce2727] transition-colors"
-                        >
-                            &larr; Back to Login
-                        </button>
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pt-2">
+                    <button
+                        type="button"
+                        onClick={handleLogout}
+                        className="text-xs font-bold text-slate-500 hover:text-[#ce2727] transition-colors flex items-center gap-1"
+                    >
+                        <span>&larr;</span> Back to Login
+                    </button>
 
-                        <PrimaryButton 
-                            onClick={resendEmail} 
-                            disabled={processing}
-                            className="justify-center px-6 py-2 text-xs"
-                        >
-                            {processing ? 'Sending...' : 'Resend Verification Email'}
-                        </PrimaryButton>
-                    </div>
-                </form>
+                    <PrimaryButton 
+                        onClick={resendEmail} 
+                        disabled={processing}
+                        className="justify-center px-6 py-2 text-xs"
+                    >
+                        {processing ? 'Sending...' : 'Resend Verification Email'}
+                    </PrimaryButton>
+                </div>
             </div>
         </GuestLayout>
     );
