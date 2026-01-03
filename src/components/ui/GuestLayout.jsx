@@ -75,6 +75,13 @@ export default function GuestLayout({ children, isDarkMode, toggleDarkMode }) {
                     
                     {children}
 
+                    {/* Added Developed by text */}
+                    <div className="mt-auto pt-2 text-center">
+                        <p className="text-[10px] font-medium text-slate-400 dark:text-slate-500 uppercase tracking-widest opacity-80">
+                            Developed by bin
+                        </p>
+                    </div>
+
                 </motion.div>
             </div>
         </div>

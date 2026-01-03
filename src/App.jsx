@@ -290,7 +290,7 @@ const App = () => {
   // Case D: Logged In -> Main Dashboard
   // This code is now completely unreachable unless `session` is true.
   return (
-    <div className={`h-screen flex flex-col transition-colors duration-300 ${isDarkMode ? 'bg-[#0f172a]' : 'bg-[#f0f2f5]'} overflow-hidden`}>
+    <div className={`h-screen flex flex-col transition-colors duration-300 ${isDarkMode ? 'bg-[#0f172a]' : 'bg-[#f0f2f5]'} overflow-hidden relative`}>
       <Navbar 
         isDarkMode={isDarkMode} 
         toggleDarkMode={toggleDarkMode} 
@@ -330,6 +330,11 @@ const App = () => {
       {isModalOpen && (
         <AddRecordModal onClose={handleCloseModal} onSave={handleSaveRecord} transactions={transactions} initialData={editingTransaction} />
       )}
+
+      {/* Added For Red text */}
+      <div className="fixed bottom-1 right-6 text-[10px] font-black text-slate-300 dark:text-slate-700 uppercase tracking-widest pointer-events-none z-50">
+          For Red JT
+      </div>
     </div>
   );
 };
