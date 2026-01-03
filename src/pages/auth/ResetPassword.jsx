@@ -27,7 +27,6 @@ export default function ResetPassword({ onNavigate, isDarkMode, toggleDarkMode }
             if (error) throw error;
             
             alert('Password updated successfully!');
-            // Clear the reset mode in App.jsx (handled by parent logic or redirect)
             window.location.href = "/"; 
         } catch (err) {
             setError(err.message);

@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 
-// CHANGED: Accept userProfile and onUpdateProfile props
 export const ProfilePage = ({ onBack, userProfile, onUpdateProfile }) => {
   const [profile, setProfile] = useState(userProfile || {
     name: 'Admin User',
@@ -10,19 +9,12 @@ export const ProfilePage = ({ onBack, userProfile, onUpdateProfile }) => {
   });
 
   const fileInputRef = useRef(null);
+  const [passwordForm, setPasswordForm] = useState({ current: '', new: '', confirm: '' });
 
-  const [passwordForm, setPasswordForm] = useState({
-    current: '',
-    new: '',
-    confirm: ''
-  });
-
-  // Sync state if prop changes
   useEffect(() => {
     if (userProfile) setProfile(userProfile);
   }, [userProfile]);
 
-  // NEW: Image Upload Handler
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -36,7 +28,6 @@ export const ProfilePage = ({ onBack, userProfile, onUpdateProfile }) => {
 
   const handleUpdateProfile = (e) => {
     e.preventDefault();
-    // CHANGED: Call prop to update global state
     if (onUpdateProfile) {
       onUpdateProfile(profile);
     }
@@ -54,11 +45,11 @@ export const ProfilePage = ({ onBack, userProfile, onUpdateProfile }) => {
   };
 
   return (
-    <div className="flex flex-col gap-4 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="flex flex-col gap-4 overflow-y-auto pb-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* HEADER */}
       <div className="flex items-center justify-between shrink-0 px-1">
         <div>
-          <h1 className="text-2xl font-black text-slate-800 dark:text-white flex items-center gap-2">
+          <h1 className="text-xl sm:text-2xl font-black text-slate-800 dark:text-white flex items-center gap-2">
             <span 
               className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-pointer transition-colors"
               onClick={onBack}
@@ -74,15 +65,15 @@ export const ProfilePage = ({ onBack, userProfile, onUpdateProfile }) => {
           className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full text-xs font-black text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all active:scale-95"
         >
           <span className="material-symbols-outlined text-[18px]">arrow_back</span>
-          Back
+          <span className="hidden sm:inline">Back</span>
         </button>
       </div>
 
       {/* MAIN CONTENT GRID */}
       <div className="grid grid-cols-12 gap-5">
         
-        {/* LEFT COLUMN: ACCOUNT DETAILS (Span 7) */}
-        <div className="col-span-7 flex flex-col gap-4">
+        {/* LEFT COLUMN: ACCOUNT DETAILS */}
+        <div className="col-span-12 lg:col-span-7 flex flex-col gap-4">
           <div className="bg-white dark:bg-slate-900 rounded-[24px] p-6 border border-slate-100 dark:border-slate-800 shadow-sm flex flex-col">
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
@@ -91,13 +82,13 @@ export const ProfilePage = ({ onBack, userProfile, onUpdateProfile }) => {
                 Personal Information
               </h2>
               <span className="bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
-                Administrator
+                Admin
               </span>
             </div>
 
             <form onSubmit={handleUpdateProfile} className="flex flex-col gap-5">
               {/* Avatar Row */}
-              <div className="flex items-center gap-5">
+              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5">
                 <div 
                   className="relative group shrink-0 cursor-pointer"
                   onClick={() => fileInputRef.current?.click()} 
@@ -110,16 +101,9 @@ export const ProfilePage = ({ onBack, userProfile, onUpdateProfile }) => {
                   <button type="button" className="absolute -bottom-1 -right-1 w-8 h-8 bg-[#ce2727] text-white rounded-full flex items-center justify-center shadow-md border-2 border-white dark:border-slate-900 group-hover:scale-110 transition-transform">
                     <span className="material-symbols-outlined text-[16px]">edit</span>
                   </button>
-                  {/* HIDDEN INPUT */}
-                  <input 
-                    type="file" 
-                    ref={fileInputRef} 
-                    onChange={handleImageUpload} 
-                    accept="image/*" 
-                    className="hidden" 
-                  />
+                  <input type="file" ref={fileInputRef} onChange={handleImageUpload} accept="image/*" className="hidden" />
                 </div>
-                <div className="flex-1">
+                <div className="flex-1 w-full">
                   <ProfileInput 
                     label="Full Name" 
                     value={profile.name} 
@@ -130,7 +114,7 @@ export const ProfilePage = ({ onBack, userProfile, onUpdateProfile }) => {
               </div>
 
               {/* Grid Inputs */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <ProfileInput 
                   label="Email Address" 
                   value={profile.email} 
@@ -148,7 +132,7 @@ export const ProfilePage = ({ onBack, userProfile, onUpdateProfile }) => {
               <div className="mt-2 flex justify-end">
                 <button 
                   type="submit"
-                  className="px-8 py-3.5 bg-[#ce2727] text-white rounded-xl text-xs font-black shadow-lg shadow-[#ce272733] hover:scale-105 active:scale-95 transition-all uppercase tracking-wide"
+                  className="w-full sm:w-auto px-8 py-3.5 bg-[#ce2727] text-white rounded-xl text-xs font-black shadow-lg shadow-[#ce272733] hover:scale-105 active:scale-95 transition-all uppercase tracking-wide"
                 >
                   Save Changes
                 </button>
@@ -157,9 +141,9 @@ export const ProfilePage = ({ onBack, userProfile, onUpdateProfile }) => {
           </div>
 
           {/* 2FA Card */}
-          <div className="bg-slate-800 rounded-[24px] p-5 text-white flex items-center justify-between shrink-0 shadow-lg shadow-slate-200 dark:shadow-none">
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-white">
+          <div className="bg-slate-800 rounded-[24px] p-5 text-white flex flex-col sm:flex-row items-center justify-between gap-4 shrink-0 shadow-lg shadow-slate-200 dark:shadow-none">
+            <div className="flex items-center gap-4 w-full sm:w-auto">
+              <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-white shrink-0">
                  <span className="material-symbols-outlined text-xl">security</span>
               </div>
               <div>
@@ -167,14 +151,14 @@ export const ProfilePage = ({ onBack, userProfile, onUpdateProfile }) => {
                 <p className="text-xs text-slate-400 font-medium">Secure your account.</p>
               </div>
             </div>
-            <button className="px-5 py-2.5 bg-white text-slate-900 hover:bg-slate-100 rounded-xl text-xs font-black transition-colors uppercase tracking-wide">
+            <button className="w-full sm:w-auto px-5 py-2.5 bg-white text-slate-900 hover:bg-slate-100 rounded-xl text-xs font-black transition-colors uppercase tracking-wide">
               Enable
             </button>
           </div>
         </div>
 
-        {/* RIGHT COLUMN: SECURITY (Span 5) */}
-        <div className="col-span-5 flex flex-col gap-4">
+        {/* RIGHT COLUMN: SECURITY */}
+        <div className="col-span-12 lg:col-span-5 flex flex-col gap-4">
           <div className="bg-white dark:bg-slate-900 rounded-[24px] p-6 border border-slate-100 dark:border-slate-800 shadow-sm flex flex-col">
             <h2 className="text-base font-black text-slate-800 dark:text-white mb-4 flex items-center gap-2">
               <span className="material-symbols-outlined text-[#ce2727] text-xl">lock</span>
@@ -209,9 +193,6 @@ export const ProfilePage = ({ onBack, userProfile, onUpdateProfile }) => {
               />
 
               <div className="mt-2 pt-2">
-                <p className="text-[10px] text-slate-400 font-bold italic mb-3 leading-tight ml-1">
-                  * Must be at least 8 chars with numbers.
-                </p>
                 <button 
                   type="submit"
                   className="w-full py-3.5 bg-slate-900 dark:bg-slate-800 text-white rounded-xl text-xs font-black hover:bg-slate-800 dark:hover:bg-slate-700 active:scale-95 transition-all uppercase tracking-wide"
@@ -225,7 +206,7 @@ export const ProfilePage = ({ onBack, userProfile, onUpdateProfile }) => {
           {/* Danger Zone */}
           <div className="bg-red-50 dark:bg-red-900/10 rounded-[24px] p-5 border border-red-100 dark:border-red-900/20 shrink-0 flex items-center justify-between">
             <div className="flex items-center gap-3">
-               <div className="w-10 h-10 rounded-xl bg-red-100 dark:bg-red-900/40 flex items-center justify-center text-red-600 dark:text-red-400">
+               <div className="w-10 h-10 rounded-xl bg-red-100 dark:bg-red-900/40 flex items-center justify-center text-red-600 dark:text-red-400 shrink-0">
                  <span className="material-symbols-outlined text-xl">warning</span>
                </div>
                <div>
@@ -244,7 +225,7 @@ export const ProfilePage = ({ onBack, userProfile, onUpdateProfile }) => {
 };
 
 const ProfileInput = ({ label, value, onChange, icon, type = "text", placeholder }) => (
-  <div className="flex flex-col gap-1.5">
+  <div className="flex flex-col gap-1.5 w-full">
     <label className="text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider ml-1">{label}</label>
     <div className="relative">
       <span className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 text-[20px]">

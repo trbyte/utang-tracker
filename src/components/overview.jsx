@@ -17,68 +17,74 @@ export const Overview = ({ stats, recentTransactions = [], isDarkMode }) => {
         { name: 'Completed', value: stats.completedCount, color: '#da9595' }
       ];
     }
-    // CHANGED: Filter out items with 0 value to prevent rendering artifacts (like the thin line)
     return data.filter(item => item.value > 0);
   }, [stats, chartMetric]);
 
   return (
-    <div className="flex gap-4 h-full">
-      <div className="flex-[3] flex gap-6 p-5 bg-white dark:bg-slate-900 rounded-[24px] shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden transition-colors">
+    // Stack on mobile, Row on Desktop
+    <div className="flex flex-col lg:flex-row gap-4 h-full">
+      
+      {/* LEFT SECTION (Stats + Activity) */}
+      <div className="w-full lg:flex-[3] flex flex-col gap-4 lg:gap-6 p-4 lg:p-5 bg-white dark:bg-slate-900 rounded-[24px] shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden transition-colors shrink-0">
         
-        {/* Stat Cards */}
-        <div className="flex-1 grid grid-cols-2 grid-rows-2 gap-2.5 min-w-0">
-          <StatCard 
-            title="Owed" 
-            value={`₱${stats.totalOwed.toLocaleString()}`} 
-            footer={`By ${stats.lastUpdated}`}
-            isAccent
-          />
-          <StatCard 
-            title="Returned" 
-            value={`₱${stats.totalReturned.toLocaleString()}`} 
-            footer={`By ${stats.lastUpdated}`}
-          />
-          <StatCard 
-            title="Completed" 
-            value={stats.completedCount.toString()} 
-            footer="Settled"
-          />
-          <StatCard 
-            title="Pending" 
-            value={stats.pendingCount.toString()} 
-            footer="Active"
-          />
-        </div>
+        {/* INNER CONTAINER: Stack on mobile, Row on Desktop (Side-by-Side) */}
+        <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 h-full">
+          
+          {/* Stat Cards */}
+          <div className="flex-1 grid grid-cols-2 gap-2.5 min-w-0 h-auto lg:h-full content-start">
+            <StatCard 
+              title="Owed" 
+              value={`₱${stats.totalOwed.toLocaleString()}`} 
+              footer={`By ${stats.lastUpdated}`}
+              isAccent
+            />
+            <StatCard 
+              title="Returned" 
+              value={`₱${stats.totalReturned.toLocaleString()}`} 
+              footer={`By ${stats.lastUpdated}`}
+            />
+            <StatCard 
+              title="Completed" 
+              value={stats.completedCount.toString()} 
+              footer="Settled"
+            />
+            <StatCard 
+              title="Pending" 
+              value={stats.pendingCount.toString()} 
+              footer="Active"
+            />
+          </div>
 
-        {/* Recent Activity List */}
-        <div className="flex-1 flex flex-col gap-2 min-w-0">
-          <h3 className="text-[10px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-widest px-1">
-            Recent Activity
-          </h3>
+          {/* Recent Activity List */}
+          <div className="flex-1 flex flex-col gap-2 min-w-0 min-h-[200px] lg:min-h-0 lg:h-full">
+            <h3 className="text-[10px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-widest px-1">
+              Recent Activity
+            </h3>
 
-          <div className="flex-1 flex flex-col gap-1.5 overflow-y-auto pr-1 custom-scroll">
-            {recentTransactions.length > 0 ? (
-              recentTransactions.map(t => (
-                <div key={t.id} className="flex items-center gap-2.5 p-2.5 bg-slate-50 dark:bg-slate-800/40 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-                  <img src={t.avatar} className="w-7 h-7 rounded-full border border-white dark:border-slate-700 shadow-sm" alt="" />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-bold text-slate-700 dark:text-slate-200 truncate">{t.name}</p>
-                    <p className="text-[9px] text-slate-400 dark:text-slate-500 uppercase font-medium">{t.status}</p>
+            <div className="flex-1 flex flex-col gap-1.5 overflow-y-auto pr-1 custom-scroll">
+              {recentTransactions.length > 0 ? (
+                recentTransactions.map(t => (
+                  <div key={t.id} className="flex items-center gap-2.5 p-2.5 bg-slate-50 dark:bg-slate-800/40 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                    <img src={t.avatar} className="w-7 h-7 rounded-full border border-white dark:border-slate-700 shadow-sm" alt="" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-bold text-slate-700 dark:text-slate-200 truncate">{t.name}</p>
+                      <p className="text-[9px] text-slate-400 dark:text-slate-500 uppercase font-medium">{t.status}</p>
+                    </div>
+                    <p className="text-xs font-black text-slate-800 dark:text-white shrink-0">₱{t.amount.toLocaleString()}</p>
                   </div>
-                  <p className="text-xs font-black text-slate-800 dark:text-white shrink-0">₱{t.amount.toLocaleString()}</p>
+                ))
+              ) : (
+                <div className="flex-1 flex items-center justify-center text-slate-400 text-[10px] font-bold uppercase tracking-wider">
+                  No recent activity
                 </div>
-              ))
-            ) : (
-              <div className="flex-1 flex items-center justify-center text-slate-400 text-[10px] font-bold uppercase tracking-wider">
-                No recent activity
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Pie Chart Section */}
-      <div className="flex-1 bg-white dark:bg-slate-900 rounded-[24px] shadow-sm border border-slate-100 dark:border-slate-800 p-4 flex flex-col items-center justify-center relative transition-colors">
+      {/* RIGHT SECTION (Pie Chart) */}
+      <div className="min-h-[300px] lg:min-h-0 w-full lg:flex-1 bg-white dark:bg-slate-900 rounded-[24px] shadow-sm border border-slate-100 dark:border-slate-800 p-4 flex flex-col items-center justify-center relative transition-colors shrink-0">
         
         <div className="absolute top-4 left-4 right-4 flex justify-between items-start z-10">
           <h3 className="text-[10px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-widest mt-1">Analytics</h3>
@@ -108,7 +114,6 @@ export const Overview = ({ stats, recentTransactions = [], isDarkMode }) => {
                 cy="50%"
                 innerRadius={0}
                 outerRadius="80%"
-                // CHANGED: Set paddingAngle to 0 for a solid chart without gaps
                 paddingAngle={0} 
                 startAngle={90}
                 endAngle={-270}
