@@ -108,7 +108,7 @@ export const Navbar = ({ isDarkMode, toggleDarkMode, transactions = [], onNaviga
                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Developer Contact</p>
                   <a href="mailto:developer@utangtracker.com" className="text-xs font-bold text-[#ce2727] hover:underline flex items-center gap-1.5">
                     <span className="material-symbols-outlined text-sm">mail</span>
-                    developer@utangtracker.com
+                    lavieen.alvarez@carsu.edu.ph
                   </a>
                 </div>
               </div>

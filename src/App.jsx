@@ -30,26 +30,41 @@ const App = () => {
   // Auth Views
   const [authView, setAuthView] = useState('LOGIN'); 
   const [isPasswordResetting, setIsPasswordResetting] = useState(false);
-  const [pendingEmail, setPendingEmail] = useState(''); // NEW: Track who needs verification
+  const [pendingEmail, setPendingEmail] = useState('');
 
-  // Lifted Profile State
+  // Profile State
   const [userProfile, setUserProfile] = useState({
-    name: 'Admin User',
-    email: 'admin@utangtracker.pro',
-    phone: '+63 917 123 4567',
-    avatar: 'https://picsum.photos/seed/admin/200'
+    name: '',
+    email: '',
+    phone: '',
+    avatar: ''
   });
 
   const [isDarkMode, setIsDarkMode] = useState(() => {
     return localStorage.getItem('theme') === 'dark';
   });
 
+  const updateUserProfile = (user) => {
+    if (!user) return;
+    setUserProfile({
+      // Checks for metadata name, fallback to email
+      name: user.user_metadata?.name || user.user_metadata?.full_name || user.email.split('@')[0], 
+      email: user.email,
+      phone: user.user_metadata?.phone || '',
+      avatar: user.user_metadata?.avatar_url || `https://ui-avatars.com/api/?name=${user.email}&background=random`
+    });
+  };
+
   // 1. Handle Authentication & Session
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
-      if (session) fetchTransactions();
-      else setLoading(false);
+      if (session) {
+        updateUserProfile(session.user);
+        fetchTransactions(session.user.id);
+      } else {
+        setLoading(false); // Only stop loading here if NO session
+      }
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
@@ -57,20 +72,32 @@ const App = () => {
         setIsPasswordResetting(true);
       }
       setSession(session);
-      if (session) fetchTransactions();
-      else setTransactions([]);
+      
+      if (session) {
+        updateUserProfile(session.user);
+        fetchTransactions(session.user.id);
+      } else {
+        setTransactions([]);
+        setUserProfile({ name: '', email: '', phone: '', avatar: '' });
+        // Ensure we stop loading if the user logs out
+        setLoading(false); 
+      }
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
   // 2. Fetch Data
-  const fetchTransactions = async () => {
+  const fetchTransactions = async (userId) => {
+    const currentUserId = userId || session?.user?.id;
+    if (!currentUserId) return; 
+
     try {
       setLoading(true);
       const { data, error } = await supabase
         .from('transactions')
         .select('*')
+        .eq('user_id', currentUserId)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -97,7 +124,6 @@ const App = () => {
     }
   };
 
-  // 3. Dark Mode Logic
   useEffect(() => {
     if (isDarkMode) {
       document.documentElement.classList.add('dark');
@@ -110,7 +136,7 @@ const App = () => {
 
   const toggleDarkMode = () => setIsDarkMode(!isDarkMode);
 
-  // 4. Computed Stats
+  // Computed Stats
   const stats = useMemo(() => {
     const totalOwed = transactions
       .filter(t => t.status !== TransactionStatus.COMPLETED)
@@ -135,7 +161,7 @@ const App = () => {
 
   const selectedTransaction = useMemo(() => transactions.find(t => t.id === selectedId) || null, [transactions, selectedId]);
 
-  // 5. Actions
+  // Actions
   const handleSaveRecord = async (record) => {
     if (!session) return;
     try {
@@ -156,7 +182,7 @@ const App = () => {
       } else {
         await supabase.from('transactions').insert([dbRecord]);
       }
-      await fetchTransactions();
+      await fetchTransactions(session.user.id);
       handleCloseModal();
     } catch (error) {
       alert('Error saving record: ' + error.message);
@@ -173,18 +199,34 @@ const App = () => {
         })
         .eq('id', id);
         
-      await fetchTransactions();
+      await fetchTransactions(session.user.id);
     } catch (error) {
-      console.error('Error settling transaction:', error.message); // Logs to console instead of alerting
+      console.error('Error settling transaction:', error.message);
     }
   };
 
   const handleEditClick = (t) => { setEditingTransaction(t); setIsModalOpen(true); };
   const handleCloseModal = () => { setIsModalOpen(false); setEditingTransaction(null); };
 
-  // 6. MAIN RENDER & AUTH LOGIC
-  
-  // Case A: Password Reset (Happens via email link)
+  // --- RENDER LOGIC ---
+
+  // Case A: LOADING GUARD (Protects routes while checking auth)
+  // We only show this if loading is true AND we don't have a session yet.
+  // This prevents the "Dashboard" from flashing for 0.5s before Login appears.
+  if (loading && !session) {
+    return (
+       <div className={`min-h-screen flex items-center justify-center transition-colors duration-300 ${isDarkMode ? 'bg-[#0f172a]' : 'bg-[#f0f2f5]'}`}>
+         <div className="flex flex-col items-center gap-4 animate-in fade-in duration-500">
+           <div className="w-12 h-12 bg-[#ce2727] rounded-xl flex items-center justify-center shadow-lg shadow-red-500/40 animate-bounce">
+              <span className="material-symbols-outlined text-white text-2xl">payments</span>
+           </div>
+           <p className="text-slate-500 dark:text-slate-400 text-xs font-black tracking-widest uppercase animate-pulse">Loading UtangTracker...</p>
+         </div>
+       </div>
+    );
+  }
+
+  // Case B: Password Reset
   if (isPasswordResetting) {
     return (
       <ResetPassword 
@@ -195,14 +237,14 @@ const App = () => {
     );
   }
 
-  // Case B: Not Logged In -> Show Auth Pages
-  if (!session && !loading) {
+  // Case C: Not Logged In -> Show Auth Pages
+  // Since we handled the "loading" state in Case A, we know for sure here that user is NOT logged in.
+  if (!session) {
     switch (authView) {
       case 'REGISTER':
         return (
           <Register 
             onLoginClick={() => setAuthView('LOGIN')} 
-            // NEW: Handle successful registration
             onRegisterSuccess={(email) => {
                setPendingEmail(email);
                setAuthView('VERIFY_EMAIL');
@@ -222,7 +264,7 @@ const App = () => {
       case 'VERIFY_EMAIL':
         return (
            <VerifyEmail 
-             email={pendingEmail} // Pass the email we captured
+             email={pendingEmail}
              onNavigate={setAuthView} 
              isDarkMode={isDarkMode} 
              toggleDarkMode={toggleDarkMode}
@@ -234,7 +276,6 @@ const App = () => {
           <Login 
             onRegisterClick={() => setAuthView('REGISTER')} 
             onForgotPasswordClick={() => setAuthView('FORGOT_PASSWORD')}
-            // NEW: Handle unverified email error
             onUnverified={(email) => {
                 setPendingEmail(email);
                 setAuthView('VERIFY_EMAIL');
@@ -246,7 +287,8 @@ const App = () => {
     }
   }
 
-  // Case C: Logged In -> Main Dashboard
+  // Case D: Logged In -> Main Dashboard
+  // This code is now completely unreachable unless `session` is true.
   return (
     <div className={`h-screen flex flex-col transition-colors duration-300 ${isDarkMode ? 'bg-[#0f172a]' : 'bg-[#f0f2f5]'} overflow-hidden`}>
       <Navbar 
@@ -254,7 +296,7 @@ const App = () => {
         toggleDarkMode={toggleDarkMode} 
         transactions={transactions}
         onNavigate={setCurrentView}
-        userProfile={userProfile}
+        userProfile={userProfile} 
       />
       <main className="flex-1 p-6 flex flex-col gap-6 overflow-hidden">
         {currentView === 'DASHBOARD' ? (
@@ -263,8 +305,12 @@ const App = () => {
               <Overview stats={stats} recentTransactions={transactions.slice(0, 5)} isDarkMode={isDarkMode} />
             </section>
             <section className="flex-1 min-h-0">
+              {/* Internal loading state for data fetching */}
               {loading ? (
-                <div className="h-full flex items-center justify-center text-slate-400 font-bold animate-pulse">Loading...</div>
+                <div className="h-full flex flex-col items-center justify-center gap-3 text-slate-400">
+                    <div className="w-6 h-6 border-2 border-[#ce2727] border-t-transparent rounded-full animate-spin"></div>
+                    <span className="text-xs font-bold">Syncing records...</span>
+                </div>
               ) : (
                 <TransactionSection 
                   transactions={filteredTransactions} selectedTransaction={selectedTransaction}

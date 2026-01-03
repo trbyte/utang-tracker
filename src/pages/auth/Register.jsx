@@ -36,7 +36,7 @@ export default function Register({ onLoginClick, onRegisterSuccess, isDarkMode, 
             });
             if (error) throw error;
             
-            // 2. THIS IS THE CHANGE 👇
+            // 2.
             // Instead of alerting, we check if onRegisterSuccess exists and call it.
             if (onRegisterSuccess) {
                 onRegisterSuccess(data.email); 

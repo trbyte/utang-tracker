@@ -41,7 +41,7 @@ export default function GuestLayout({ children, isDarkMode, toggleDarkMode }) {
                                 Smart Debt Management
                             </div>
                             <p className="text-3xl font-black leading-tight text-slate-900 dark:text-[#ce2727] drop-shadow-sm dark:drop-shadow-[0_0_25px_rgba(206,39,39,0.45)]">
-                                Keep track of who owes you, <span className="text-[#ce2727] dark:text-white">and who you owe.</span>
+                                Keep track of who owes you, <span className="text-[#ce2727] dark:text-white">and notify them.</span>
                             </p>
                             <p className="max-w-sm text-sm font-medium text-slate-600 dark:text-slate-300 leading-relaxed">
                                 Sign in or create an account to start managing your transactions and keep your financial relationships healthy.

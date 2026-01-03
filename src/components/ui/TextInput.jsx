@@ -18,15 +18,25 @@ export default forwardRef(function TextInput(
 
     return (
         <>
-            {/* 1. Global Override for Browser Autofill (Blue background fix) */}
             <style>{`
+                /* 1. LIGHT MODE (Default) */
+                /* We use box-shadow to "paint" over the browser's yellow autofill background */
                 input:-webkit-autofill,
                 input:-webkit-autofill:hover, 
                 input:-webkit-autofill:focus, 
                 input:-webkit-autofill:active {
-                    -webkit-box-shadow: 0 0 0 30px #0f172a inset !important; /* Dark Slate Background */
-                    -webkit-text-fill-color: white !important; /* Force White Text */
-                    transition: background-color 5000s ease-in-out 0s;
+                    -webkit-box-shadow: 0 0 0 30px #f3f4f6 inset !important; /* Matches bg-gray-100 */
+                    -webkit-text-fill-color: #0f172a !important; /* Matches text-slate-900 */
+                    caret-color: #0f172a !important;
+                }
+
+                /* 2. DARK MODE (Applied when .dark class is present) */
+                .dark input:-webkit-autofill,
+                .dark input:-webkit-autofill:hover, 
+                .dark input:-webkit-autofill:focus, 
+                .dark input:-webkit-autofill:active {
+                    -webkit-box-shadow: 0 0 0 30px #0f172a inset !important; /* Matches bg-slate-900 */
+                    -webkit-text-fill-color: white !important;
                     caret-color: white !important;
                 }
             `}</style>
@@ -35,22 +45,18 @@ export default forwardRef(function TextInput(
                 {...props}
                 type={type}
                 className={
-                    // 2. LAYOUT: 'w-full' makes it stretch to full width
+                    // Layout & Base Styles
                     'rounded-md shadow-sm transition-all duration-200 py-3 px-4 w-full block ' +
                     
-                    // LIGHT MODE
-                    'border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 ' +
+                    // LIGHT MODE: bg-gray-100 (#f3f4f6) matches the box-shadow above
+                    'border-slate-300 bg-gray-100 text-slate-900 placeholder:text-slate-400 ' +
                     
-                    // ACTIVE / FOCUS STATE (Red Highlight)
-                    'focus:outline-none ' +
-                    'focus:border-[#ce2727] ' + 
-                    'focus:ring-[#ce2727] ' +   
-                    'focus:ring-1 ' +
+                    // FOCUS STATE
+                    'focus:outline-none focus:border-[#ce2727] focus:ring-[#ce2727] focus:ring-1 ' +
 
-                    // DARK MODE
-                    'dark:border-slate-700 dark:bg-slate-900/50 dark:text-white dark:placeholder:text-slate-500 ' +
+                    // DARK MODE: bg-slate-900 (#0f172a) matches the box-shadow above
+                    'dark:border-slate-700 dark:bg-slate-900 dark:text-white dark:placeholder:text-slate-500 ' +
                     'dark:focus:border-[#ce2727] dark:focus:ring-[#ce2727] ' +
-                    'dark:focus:bg-slate-900 ' + 
                     
                     className
                 }

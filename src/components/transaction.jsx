@@ -93,7 +93,7 @@ export const TransactionSection = ({
           <span></span>
           <span className="text-left">Name</span>
           <span className="text-center">Amount</span>
-          <span className="text-center">Encoded On</span> {/* Changed label to fit context */}
+          <span className="text-center">Created On</span> {/* Changed label to fit context */}
           <span className="text-center">Status</span>
         </div>
 
