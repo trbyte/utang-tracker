@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { TransactionStatus } from '../types';
 
-// --- NEW HELPER FUNCTION: Forces Philippine Time Format ---
 const formatToPHTime = (dateString) => {
   if (!dateString) return '-- / --';
   const date = new Date(dateString);
@@ -12,7 +11,7 @@ const formatToPHTime = (dateString) => {
     hour: 'numeric', 
     minute: '2-digit', 
     hour12: true,
-    timeZone: 'Asia/Manila' // Forces PH Timezone
+    timeZone: 'Asia/Manila' 
   }).format(date);
 };
 
@@ -29,41 +28,42 @@ export const TransactionSection = ({
   onEdit
 }) => {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-
   const filterOptions = ['ALL', TransactionStatus.PENDING, TransactionStatus.COMPLETED];
 
   return (
-    <div className="h-full bg-white dark:bg-slate-900 rounded-[32px] shadow-sm border border-slate-100 dark:border-slate-800 flex gap-6 p-6 relative overflow-hidden transition-colors">
+    <div className="h-auto lg:h-full bg-white dark:bg-slate-900 rounded-[32px] shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col lg:flex-row gap-6 p-4 lg:p-6 relative overflow-visible lg:overflow-hidden transition-colors">
       
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-40 h-6 bg-[#f0f2f5] dark:bg-slate-800 rounded-b-[18px]"></div>
+      {/* Decorative Notch (Desktop Only) */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-40 h-6 bg-[#f0f2f5] dark:bg-slate-800 rounded-b-[18px] hidden lg:block"></div>
 
-      <div className="flex-[2] flex flex-col min-h-0 z-10">
+      {/* LEFT SECTION: Transaction List */}
+      <div className="w-full lg:flex-[2] flex flex-col z-10">
         
         {/* Header Actions */}
-        <div className="flex items-center justify-start gap-3 shrink-0 mb-4">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-start gap-3 shrink-0 mb-4">
           <button 
             onClick={onAddClick}
-            className="flex items-center gap-1.5 px-5 py-2.5 bg-[#ce2727] text-white rounded-full text-xs font-black shadow-lg shadow-[#ce272733] hover:scale-105 active:scale-95 transition-all shrink-0"
+            className="flex items-center justify-center gap-1.5 px-5 py-2.5 bg-[#ce2727] text-white rounded-full text-xs font-black shadow-lg shadow-[#ce272733] hover:scale-105 active:scale-95 transition-all shrink-0"
           >
             <span className="material-symbols-outlined text-lg">add</span>
             Add Record
           </button>
 
-          <div className="relative w-64">
+          <div className="relative w-full sm:w-64">
             <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-600 text-lg">search</span>
             <input 
               type="text" 
               placeholder="Search..."
-              className="pl-11 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800 rounded-full text-xs border-none focus:ring-2 focus:ring-[#da9595] dark:text-slate-200 transition-all w-full"
+              className="w-full pl-11 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800 rounded-full text-xs border-none focus:ring-2 focus:ring-[#da9595] dark:text-slate-200 transition-all"
               value={searchTerm}
               onChange={(e) => onSearchChange(e.target.value)}
             />
           </div>
 
-          <div className="relative">
+          <div className="relative w-full sm:w-auto">
             <button 
               onClick={() => setIsFilterOpen(!isFilterOpen)}
-              className={`flex items-center gap-1.5 px-4 py-2.5 border rounded-full text-xs font-bold transition-colors shrink-0 ${filterStatus !== 'ALL' ? 'bg-[#ce2727] text-white border-[#ce2727]' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700'}`}
+              className={`w-full sm:w-auto flex items-center justify-center gap-1.5 px-4 py-2.5 border rounded-full text-xs font-bold transition-colors shrink-0 ${filterStatus !== 'ALL' ? 'bg-[#ce2727] text-white border-[#ce2727]' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700'}`}
             >
               <span className="material-symbols-outlined text-[18px]">tune</span>
               {filterStatus === 'ALL' ? 'Filter' : filterStatus}
@@ -72,7 +72,7 @@ export const TransactionSection = ({
             {isFilterOpen && (
               <>
                 <div className="fixed inset-0 z-10" onClick={() => setIsFilterOpen(false)}></div>
-                <div className="absolute top-full left-0 mt-2 w-40 bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-800 py-2 z-20 overflow-hidden">
+                <div className="absolute top-full left-0 sm:left-auto sm:right-0 mt-2 w-full sm:w-40 bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-800 py-2 z-20 overflow-hidden">
                   {filterOptions.map(status => (
                     <button
                       key={status}
@@ -88,33 +88,35 @@ export const TransactionSection = ({
           </div>
         </div>
 
-        {/* Table Header */}
-        <div className="grid grid-cols-[48px_1fr_120px_160px_100px] gap-6 px-4 py-2.5 text-[10px] font-black text-slate-300 dark:text-slate-600 uppercase tracking-widest border-b dark:border-slate-800">
+        {/* Responsive Table Header */}
+        <div className="grid grid-cols-[48px_1fr_100px] md:grid-cols-[48px_1fr_120px_160px_100px] gap-4 md:gap-6 px-4 py-2.5 text-[10px] font-black text-slate-300 dark:text-slate-600 uppercase tracking-widest border-b dark:border-slate-800">
           <span></span>
           <span className="text-left">Name</span>
           <span className="text-center">Amount</span>
-          <span className="text-center">Created On</span> {/* Changed label to fit context */}
-          <span className="text-center">Status</span>
+          <span className="text-center hidden md:block">Created On</span>
+          <span className="text-center hidden md:block">Status</span>
         </div>
 
-        {/* Table Body */}
-        <div className="flex-1 overflow-y-auto pr-1 mt-1 custom-scroll">
+        {/* Transaction List */}
+        <div className="flex-1 mt-1 custom-scroll overflow-visible lg:overflow-y-auto">
           {transactions.map(t => (
             <div 
               key={t.id}
               onClick={() => onSelect(t.id)}
-              className={`grid grid-cols-[48px_1fr_120px_160px_100px] gap-6 items-center px-4 py-3 mb-1.5 rounded-2xl cursor-pointer transition-all border ${selectedTransaction?.id === t.id ? 'bg-[#ce2727]/5 dark:bg-[#ce2727]/10 border-[#ce2727]' : 'bg-slate-50 dark:bg-slate-800/40 border-transparent hover:bg-slate-100 dark:hover:bg-slate-800 hover:border-slate-200 dark:hover:border-slate-700'}`}
+              className={`grid grid-cols-[48px_1fr_100px] md:grid-cols-[48px_1fr_120px_160px_100px] gap-4 md:gap-6 items-center px-4 py-3 mb-1.5 rounded-2xl cursor-pointer transition-all border ${selectedTransaction?.id === t.id ? 'bg-[#ce2727]/5 dark:bg-[#ce2727]/10 border-[#ce2727]' : 'bg-slate-50 dark:bg-slate-800/40 border-transparent hover:bg-slate-100 dark:hover:bg-slate-800 hover:border-slate-200 dark:hover:border-slate-700'}`}
             >
               <img src={t.avatar} className="w-9 h-9 rounded-full border-2 border-white dark:border-slate-700 shadow-sm" alt="" />
-              <span className="text-xs font-bold text-slate-700 dark:text-slate-200 truncate">{t.name}</span>
+              <div className="min-w-0">
+                <span className="text-xs font-bold text-slate-700 dark:text-slate-200 truncate block">{t.name}</span>
+                <span className={`text-[9px] font-bold uppercase md:hidden ${t.status === TransactionStatus.COMPLETED ? 'text-green-600' : 'text-[#da9595]'}`}>{t.status}</span>
+              </div>
               <span className="text-xs font-black text-slate-900 dark:text-white text-center">₱{t.amount.toLocaleString()}</span>
               
-              {/* --- UPDATED: Uses 'created_at' for system time --- */}
-              <span className="text-[11px] text-slate-400 dark:text-slate-600 font-medium truncate text-center">
+              <span className="text-[11px] text-slate-400 dark:text-slate-600 font-medium truncate text-center hidden md:block">
                 {formatToPHTime(t.created_at || t.createdAt)}
               </span>
 
-              <div className="flex justify-center">
+              <div className="justify-center hidden md:flex">
                 <StatusBadge status={t.status} />
               </div>
             </div>
@@ -127,11 +129,25 @@ export const TransactionSection = ({
         </div>
       </div>
 
-      <div className="w-[360px] flex flex-col shrink-0 h-full z-10">
+      {/* RIGHT SECTION: Details Panel (Desktop) / Full Screen Overlay (Mobile) */}
+      <div className={`
+        fixed inset-0 z-50 bg-white dark:bg-slate-900 lg:static lg:bg-transparent lg:dark:bg-transparent
+        flex flex-col shrink-0 lg:w-[360px] h-full transition-transform duration-300
+        ${selectedTransaction ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'}
+      `}>
         {selectedTransaction ? (
-          <div className="h-full bg-white dark:bg-slate-900 rounded-[32px] border border-slate-100 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none flex flex-col overflow-hidden relative transition-all">
+          <div className="h-full bg-white dark:bg-slate-900 lg:rounded-[32px] lg:border lg:border-slate-100 lg:dark:border-slate-800 lg:shadow-xl shadow-slate-200/50 dark:shadow-none flex flex-col overflow-hidden relative transition-all">
             
             <div className="bg-slate-50 dark:bg-slate-800/50 p-6 pb-5 border-b border-slate-100 dark:border-slate-800 shrink-0">
+              
+              {/* Back Button for Mobile */}
+              <button 
+                onClick={() => onSelect(null)}
+                className="lg:hidden absolute top-4 right-4 p-2 bg-white dark:bg-slate-800 rounded-full shadow-sm text-slate-500 border border-slate-100 dark:border-slate-700"
+              >
+                <span className="material-symbols-outlined">close</span>
+              </button>
+
               <div className="flex items-center gap-4">
                 <div className="relative shrink-0">
                   <div className="w-16 h-16 rounded-2xl overflow-hidden shadow-lg border-4 border-white dark:border-slate-700">
@@ -154,11 +170,10 @@ export const TransactionSection = ({
             </div>
 
             <div className="flex-1 overflow-y-auto custom-scroll p-6 space-y-5 bg-white dark:bg-slate-900">
-              
               <div className="p-4 bg-slate-50 dark:bg-slate-800/30 rounded-2xl border border-slate-100 dark:border-slate-700 space-y-3">
                 <div className="flex gap-3 items-start">
                   <span className="material-symbols-outlined text-slate-300 dark:text-slate-500 mt-0.5 text-[18px]">mail</span>
-                  <div className="min-w-0">
+                  <div className="min-w-0 flex-1">
                     <p className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wide">Email Address</p>
                     <p className="text-slate-700 dark:text-slate-200 font-bold text-xs truncate">{selectedTransaction.email}</p>
                   </div>
@@ -193,7 +208,6 @@ export const TransactionSection = ({
                   </div>
                   <div>
                     <p className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wide">Date Borrowed</p>
-                    {/* --- UPDATED: Formats the Date Borrowed user input --- */}
                     <p className="text-slate-700 dark:text-slate-200 font-semibold text-xs">
                         {formatToPHTime(selectedTransaction.dateBorrowed)}
                     </p>
@@ -260,7 +274,7 @@ export const TransactionSection = ({
 
           </div>
         ) : (
-          <div className="flex-1 bg-slate-50 dark:bg-slate-800/40 rounded-[32px] border-2 border-dashed border-slate-200 dark:border-slate-700 flex flex-col items-center justify-center p-10 text-center text-slate-300 dark:text-slate-600">
+          <div className="hidden lg:flex flex-1 bg-slate-50 dark:bg-slate-800/40 rounded-[32px] border-2 border-dashed border-slate-200 dark:border-slate-700 flex-col items-center justify-center p-10 text-center text-slate-300 dark:text-slate-600">
              <span className="material-symbols-outlined text-6xl mb-4">person_search</span>
              <p className="text-[10px] font-black uppercase tracking-widest max-w-[180px]">Select a transaction to view full details</p>
           </div>

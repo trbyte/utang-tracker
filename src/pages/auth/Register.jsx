@@ -6,7 +6,6 @@ import InputLabel from '../../components/ui/InputLabel';
 import PrimaryButton from '../../components/ui/PrimaryButton';
 import TextInput from '../../components/ui/TextInput';
 
-// 1. Add onRegisterSuccess to the props here 👇
 export default function Register({ onLoginClick, onRegisterSuccess, isDarkMode, toggleDarkMode }) {
     const [data, setData] = useState({ 
         name: '', 
@@ -36,12 +35,9 @@ export default function Register({ onLoginClick, onRegisterSuccess, isDarkMode, 
             });
             if (error) throw error;
             
-            // 2.
-            // Instead of alerting, we check if onRegisterSuccess exists and call it.
             if (onRegisterSuccess) {
                 onRegisterSuccess(data.email); 
             } else {
-                // Fallback for safety
                 alert("Account created! Check your email to verify.");
                 onLoginClick();
             }
@@ -55,30 +51,31 @@ export default function Register({ onLoginClick, onRegisterSuccess, isDarkMode, 
 
     return (
         <GuestLayout isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode}>
-            <div className="space-y-4">
-                <div className="space-y-1">
-                    <p className="inline-flex items-center gap-2 rounded-full bg-[#ce2727]/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#ce2727] ring-1 ring-[#ce2727]/30">
-                        Join Utang Tracker
+            <div className="space-y-3">
+                <div className="space-y-0.5">
+                    <p className="inline-flex items-center gap-1.5 rounded-full bg-[#ce2727]/10 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.2em] text-[#ce2727] ring-1 ring-[#ce2727]/30">
+                        Join us
                     </p>
-                    <div className="space-y-0.5">
-                        <h1 className="text-xl font-semibold text-[#ce2727]">
-                            Create your account
+                    <div>
+                        <h1 className="text-lg sm:text-xl font-semibold text-[#ce2727]">
+                            Create account
                         </h1>
-                        <p className="text-xs text-slate-400">
-                            Save records, track debts, and unlock your financial dashboard.
+                        <p className="text-[10px] text-slate-400">
+                            Start tracking and managing your finances today.
                         </p>
                     </div>
                 </div>
 
-                <form onSubmit={submit} className="space-y-4">
-                    <div className="space-y-3">
+                <form onSubmit={submit} className="space-y-3">
+                    <div className="space-y-2">
                         <div>
-                            <InputLabel htmlFor="name" value="Name" />
+                            <InputLabel htmlFor="name" value="Name" className="text-[10px]" />
                             <TextInput
                                 id="name"
                                 name="name"
                                 value={data.name}
-                                                                autoComplete="name"
+                                className="mt-0.5 block w-full py-1.5 text-xs"
+                                autoComplete="name"
                                 isFocused={true}
                                 onChange={(e) => setData({ ...data, name: e.target.value })}
                                 required
@@ -86,58 +83,61 @@ export default function Register({ onLoginClick, onRegisterSuccess, isDarkMode, 
                         </div>
 
                         <div>
-                            <InputLabel htmlFor="email" value="Email" />
+                            <InputLabel htmlFor="email" value="Email" className="text-[10px]" />
                             <TextInput
                                 id="email"
                                 type="email"
                                 name="email"
                                 value={data.email}
+                                className="mt-0.5 block w-full py-1.5 text-xs"
                                 autoComplete="username"
                                 onChange={(e) => setData({ ...data, email: e.target.value })}
                                 required
                             />
-                            <InputError message={errors.email} className="mt-1" />
+                            <InputError message={errors.email} className="mt-0.5" />
                         </div>
 
                         <div>
-                            <InputLabel htmlFor="password" value="Password" />
+                            <InputLabel htmlFor="password" value="Password" className="text-[10px]" />
                             <TextInput
                                 id="password"
                                 type="password"
                                 name="password"
                                 value={data.password}
+                                className="mt-0.5 block w-full py-1.5 text-xs"
                                 autoComplete="new-password"
                                 onChange={(e) => setData({ ...data, password: e.target.value })}
                                 required
                             />
-                            <InputError message={errors.password} className="mt-1" />
+                            <InputError message={errors.password} className="mt-0.5" />
                         </div>
 
                         <div>
-                            <InputLabel htmlFor="password_confirmation" value="Confirm Password" />
+                            <InputLabel htmlFor="password_confirmation" value="Confirm" className="text-[10px]" />
                             <TextInput
                                 id="password_confirmation"
                                 type="password"
                                 name="password_confirmation"
                                 value={data.password_confirmation}
+                                className="mt-0.5 block w-full py-1.5 text-xs"
                                 autoComplete="new-password"
                                 onChange={(e) => setData({ ...data, password_confirmation: e.target.value })}
                                 required
                             />
-                            <InputError message={errors.password_confirmation} className="mt-1" />
+                            <InputError message={errors.password_confirmation} className="mt-0.5" />
                         </div>
                     </div>
 
-                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pt-1">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between pt-1">
                         <button
                             type="button"
                             onClick={onLoginClick}
-                            className="inline-flex items-center justify-center rounded-full border border-[#ce2727]/30 px-4 py-2 text-xs font-semibold text-[#ce2727] transition hover:border-[#ce2727]/50 hover:bg-[#ce2727]/10 hover:text-red-400"
+                            className="inline-flex items-center justify-center rounded-full border border-[#ce2727]/30 px-3 py-1 text-[9px] sm:text-xs font-semibold text-[#ce2727] transition hover:border-[#ce2727]/50 hover:bg-[#ce2727]/10 hover:text-red-400 order-2 sm:order-1"
                         >
-                            Already have an account?
+                            Log in instead?
                         </button>
 
-                        <PrimaryButton className="justify-center px-6 py-2 text-xs" disabled={processing}>
+                        <PrimaryButton className="justify-center px-4 py-1.5 text-[7.5px] sm:text-xs order-1 sm:order-2" disabled={processing}>
                             Create account
                         </PrimaryButton>
                     </div>

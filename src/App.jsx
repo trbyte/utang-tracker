@@ -47,7 +47,6 @@ const App = () => {
   const updateUserProfile = (user) => {
     if (!user) return;
     setUserProfile({
-      // Checks for metadata name, fallback to email
       name: user.user_metadata?.name || user.user_metadata?.full_name || user.email.split('@')[0], 
       email: user.email,
       phone: user.user_metadata?.phone || '',
@@ -63,7 +62,7 @@ const App = () => {
         updateUserProfile(session.user);
         fetchTransactions(session.user.id);
       } else {
-        setLoading(false); // Only stop loading here if NO session
+        setLoading(false);
       }
     });
 
@@ -79,7 +78,6 @@ const App = () => {
       } else {
         setTransactions([]);
         setUserProfile({ name: '', email: '', phone: '', avatar: '' });
-        // Ensure we stop loading if the user logs out
         setLoading(false); 
       }
     });
@@ -210,12 +208,9 @@ const App = () => {
 
   // --- RENDER LOGIC ---
 
-  // Case A: LOADING GUARD (Protects routes while checking auth)
-  // We only show this if loading is true AND we don't have a session yet.
-  // This prevents the "Dashboard" from flashing for 0.5s before Login appears.
   if (loading && !session) {
     return (
-       <div className={`min-h-screen flex items-center justify-center transition-colors duration-300 ${isDarkMode ? 'bg-[#0f172a]' : 'bg-[#f0f2f5]'}`}>
+       <div className={`h-screen w-full flex items-center justify-center transition-colors duration-300 ${isDarkMode ? 'bg-[#0f172a]' : 'bg-[#f0f2f5]'}`}>
          <div className="flex flex-col items-center gap-4 animate-in fade-in duration-500">
            <div className="w-12 h-12 bg-[#ce2727] rounded-xl flex items-center justify-center shadow-lg shadow-red-500/40 animate-bounce">
               <span className="material-symbols-outlined text-white text-2xl">payments</span>
@@ -226,71 +221,22 @@ const App = () => {
     );
   }
 
-  // Case B: Password Reset
   if (isPasswordResetting) {
-    return (
-      <ResetPassword 
-        isDarkMode={isDarkMode} 
-        toggleDarkMode={toggleDarkMode} 
-        onNavigate={setAuthView}
-      />
-    );
+    return <ResetPassword isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} onNavigate={setAuthView} />;
   }
 
-  // Case C: Not Logged In -> Show Auth Pages
-  // Since we handled the "loading" state in Case A, we know for sure here that user is NOT logged in.
   if (!session) {
     switch (authView) {
-      case 'REGISTER':
-        return (
-          <Register 
-            onLoginClick={() => setAuthView('LOGIN')} 
-            onRegisterSuccess={(email) => {
-               setPendingEmail(email);
-               setAuthView('VERIFY_EMAIL');
-            }}
-            isDarkMode={isDarkMode} 
-            toggleDarkMode={toggleDarkMode}
-          />
-        );
-      case 'FORGOT_PASSWORD':
-        return (
-          <ForgotPassword 
-            onNavigate={setAuthView} 
-            isDarkMode={isDarkMode} 
-            toggleDarkMode={toggleDarkMode}
-          />
-        );
-      case 'VERIFY_EMAIL':
-        return (
-           <VerifyEmail 
-             email={pendingEmail}
-             onNavigate={setAuthView} 
-             isDarkMode={isDarkMode} 
-             toggleDarkMode={toggleDarkMode}
-           />
-        );
-      case 'LOGIN':
-      default:
-        return (
-          <Login 
-            onRegisterClick={() => setAuthView('REGISTER')} 
-            onForgotPasswordClick={() => setAuthView('FORGOT_PASSWORD')}
-            onUnverified={(email) => {
-                setPendingEmail(email);
-                setAuthView('VERIFY_EMAIL');
-            }}
-            isDarkMode={isDarkMode} 
-            toggleDarkMode={toggleDarkMode}
-          />
-        );
+      case 'REGISTER': return <Register onLoginClick={() => setAuthView('LOGIN')} onRegisterSuccess={(email) => { setPendingEmail(email); setAuthView('VERIFY_EMAIL'); }} isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />;
+      case 'FORGOT_PASSWORD': return <ForgotPassword onNavigate={setAuthView} isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />;
+      case 'VERIFY_EMAIL': return <VerifyEmail email={pendingEmail} onNavigate={setAuthView} isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />;
+      case 'LOGIN': default: return <Login onRegisterClick={() => setAuthView('REGISTER')} onForgotPasswordClick={() => setAuthView('FORGOT_PASSWORD')} onUnverified={(email) => { setPendingEmail(email); setAuthView('VERIFY_EMAIL'); }} isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />;
     }
   }
 
-  // Case D: Logged In -> Main Dashboard
-  // This code is now completely unreachable unless `session` is true.
+  // --- RESPONSIVE LAYOUT ---
   return (
-    <div className={`h-screen flex flex-col transition-colors duration-300 ${isDarkMode ? 'bg-[#0f172a]' : 'bg-[#f0f2f5]'} overflow-hidden relative`}>
+    <div className={`h-screen w-full flex flex-col transition-colors duration-300 ${isDarkMode ? 'bg-[#0f172a]' : 'bg-[#f0f2f5]'} relative overflow-y-auto lg:overflow-hidden`}>
       <Navbar 
         isDarkMode={isDarkMode} 
         toggleDarkMode={toggleDarkMode} 
@@ -298,14 +244,17 @@ const App = () => {
         onNavigate={setCurrentView}
         userProfile={userProfile} 
       />
-      <main className="flex-1 p-6 flex flex-col gap-6 overflow-hidden">
+      
+      <main className="flex-1 flex flex-col gap-4 p-2 pb-6 lg:p-6 lg:gap-6 lg:overflow-hidden w-full">
         {currentView === 'DASHBOARD' ? (
           <>
-            <section className="h-[28%] min-h-[220px] shrink-0">
+            {/* Mobile: Height auto (stacks). Desktop: Fixed height 28% */}
+            <section className="shrink-0 h-auto lg:h-[28%] lg:min-h-[220px]">
               <Overview stats={stats} recentTransactions={transactions.slice(0, 5)} isDarkMode={isDarkMode} />
             </section>
-            <section className="flex-1 min-h-0">
-              {/* Internal loading state for data fetching */}
+            
+            {/* Mobile: Height auto (expands with list). Desktop: flex-1 */}
+            <section className="flex-1 h-auto lg:min-h-0">
               {loading ? (
                 <div className="h-full flex flex-col items-center justify-center gap-3 text-slate-400">
                     <div className="w-6 h-6 border-2 border-[#ce2727] border-t-transparent rounded-full animate-spin"></div>
@@ -325,16 +274,16 @@ const App = () => {
         ) : (
           <ProfilePage onBack={() => setCurrentView('DASHBOARD')} userProfile={userProfile} onUpdateProfile={setUserProfile} />
         )}
+
+        {/* Footer: Scrolls with content on mobile, Fixed on Desktop */}
+        <div className="block mt-4 text-center lg:fixed lg:bottom-1 lg:right-6 lg:text-right lg:mt-0 text-[10px] font-black text-slate-300 dark:text-slate-700 uppercase tracking-widest pointer-events-none z-50">
+          For Red JT
+        </div>
       </main>
       
       {isModalOpen && (
         <AddRecordModal onClose={handleCloseModal} onSave={handleSaveRecord} transactions={transactions} initialData={editingTransaction} />
       )}
-
-      {/* Added For Red text */}
-      <div className="fixed bottom-1 right-6 text-[10px] font-black text-slate-300 dark:text-slate-700 uppercase tracking-widest pointer-events-none z-50">
-          For Red JT
-      </div>
     </div>
   );
 };

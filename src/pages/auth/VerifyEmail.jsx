@@ -65,21 +65,23 @@ export default function VerifyEmail({ onNavigate, isDarkMode, toggleDarkMode, em
 
                 {/* Action Buttons */}
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pt-2">
-                    <button
-                        type="button"
-                        onClick={handleLogout}
-                        className="text-xs font-bold text-slate-500 hover:text-[#ce2727] transition-colors flex items-center gap-1"
-                    >
-                        <span>&larr;</span> Back to Login
-                    </button>
-
+                    {/* Primary Button: Order 1 on Mobile (Top), Order 2 on Desktop (Right) */}
                     <PrimaryButton 
                         onClick={resendEmail} 
                         disabled={processing}
-                        className="justify-center px-6 py-2 text-xs"
+                        className="justify-center px-5 py-1.5 text-[7.5px] sm:text-xs order-1 sm:order-2"
                     >
                         {processing ? 'Sending...' : 'Resend Verification Email'}
                     </PrimaryButton>
+
+                    {/* Back Button: Order 2 on Mobile (Bottom), Order 1 on Desktop (Left) */}
+                    <button
+                        type="button"
+                        onClick={handleLogout}
+                        className="text-xs font-bold text-slate-500 hover:text-[#ce2727] transition-colors flex items-center gap-1 order-2 sm:order-1"
+                    >
+                        <span>&larr;</span> Back to Login
+                    </button>
                 </div>
             </div>
         </GuestLayout>
